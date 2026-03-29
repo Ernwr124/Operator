@@ -49,25 +49,25 @@ graph LR
     classDef execute fill:#F59E0B,stroke:#B45309,stroke-width:2px,color:#fff,rx:10px,ry:10px;
 
     subgraph Inputs ["1. Triggers (User Input)"]
-        T_Voice(("🎤 Voice (STT)")) ::: trigger
-        T_Text(("⌨️ Text (CLI)")) ::: trigger
-        T_Vision(("📸 Screen/Cam")) ::: trigger
+        T_Voice["🎤 Voice (STT)"]:::trigger
+        T_Text["⌨️ Text (CLI)"]:::trigger
+        T_Vision["📸 Screen/Cam"]:::trigger
     end
 
     subgraph AlemCloud ["2. AI Brain (alem.plus)"]
-        M_STT["🔊 STT-KK"] ::: alem
-        M_Brain["🧠 GPT-OSS 117B"] ::: alem
-        M_Vision["👁️ Qwen 3.5 Vision"] ::: alem
+        M_STT["🔊 STT-KK"]:::alem
+        M_Brain["🧠 GPT-OSS 117B"]:::alem
+        M_Vision["👁️ Qwen 3.5 Vision"]:::alem
     end
 
     subgraph Engine ["3. Operator Core (Stateless)"]
-        E_Router{"engine.py<br>(Task Router)"} ::: core
+        E_Router{"engine.py (Router)"}:::core
     end
 
     subgraph Execution ["4. Execution (Linux OS)"]
-        X_Bash["⚡ Bash Scripts"] ::: execute
-        X_Python["🐍 Python / SDK"] ::: execute
-        X_GUI["🌐 Web/GUI (xdg-open)"] ::: execute
+        X_Bash["⚡ Bash Scripts"]:::execute
+        X_Python["🐍 Python / SDK"]:::execute
+        X_GUI["🌐 Web/GUI (xdg-open)"]:::execute
     end
 
     T_Voice -->|"Audio"| M_STT
@@ -83,80 +83,3 @@ graph LR
     E_Router -->|"Code Execution"| X_Bash
     E_Router -->|"Code Execution"| X_Python
     E_Router -->|"Code Execution"| X_GUI
-
-
-📦 Установка и запуск
-Системные требования:
-
-    ОС: Linux (Ubuntu 20.04+, Debian, Raspberry Pi OS).
-
-    Python 3.8+
-
-    Микрофон (для режимов Voice/Autonomous).
-
-1. Подготовка системы
-
-Установите необходимые системные пакеты для работы с аудио и захватом экрана:
-Bash
-
-sudo apt update
-sudo apt install -y portaudio19-dev scrot w3m
-
-2. Клонирование и зависимости
-Bash
-
-git clone [https://github.com/Ernwr124/Operator.git](https://github.com/Ernwr124/Operator.git)
-cd Operator
-
-# Рекомендуется использовать виртуальное окружение
-python3 -m venv venv
-source venv/bin/activate
-
-# Установка Python-библиотек
-pip install -r requirements.txt
-
-3. Настройка окружения (.env)
-
-Агент использует API alem.plus. Создайте файл .env в корне проекта и добавьте ваши ключи:
-Bash
-
-touch .env
-
-Внутри .env пропишите:
-Code snippet
-
-ALEM_STT_TOKEN=your_stt_token_here
-ALEM_LLM_TOKEN=your_llm_token_here
-ALEM_VISION_TOKEN=your_vision_token_here
-
-(Внимание: Убедитесь, что .env добавлен в ваш .gitignore, чтобы не скомпрометировать ключи).
-4. Запуск ядра
-Bash
-
-python3 run.py
-
-После запуска агент просканирует вашу аппаратную часть и предложит выбрать режим (1, 2 или 3).
-
-
-🎯 Примеры использования (Robotics & Hardware)
-
-Operator переводит естественный язык в вызовы SDK и системные команды бортового компьютера робота.
-
-    Управление моторикой (Unitree SDK / ROS):
-
-        "Оператор, встань, пройди два метра вперед со скоростью 0.5 м/с, а затем сделай сальто."
-        (Движок генерирует Python-скрипт с импортом unitree_sdk и последовательно отправляет сигналы на контроллеры сервоприводов).
-
-    Мультимодальная автономность (Зрение + Логика):
-
-        "Сделай снимок с передней камеры. Если впереди есть препятствие, сгенерируй скрипт обхода слева. Если путь чист — иди прямо."
-        (Движок делает снимок, Qwen Vision распознает препятствие, GPT-OSS пишет логику if/else и выполняет движение).
-
-    Диагностика бортовых систем:
-
-        "Проверь текущий заряд батареи и температуру моторов. Если заряд ниже 15%, запусти скрипт возврата на док-станцию."
-        (Агент считывает телеметрию датчиков через bash/python и принимает автономное решение о спасении робота).
-
-    Интерактивный патруль:
-
-        "Начни патрулирование по квадрату. Если увидишь человека в кадре — остановись, помаши лапой и скажи 'Приветствую' через динамик."
